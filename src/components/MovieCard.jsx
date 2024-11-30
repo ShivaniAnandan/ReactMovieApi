@@ -7,7 +7,7 @@ const MovieCard = ({ movie }) => {
     <div className="movie-card">
       <img
         className="movie-card-poster"
-        src={movie.Poster !== "N/A" ? movie.Poster : "/placeholder.png"}
+        src={movie.Poster !== "N/A" ? movie.Poster : "https://media.gettyimages.com/id/1244034031/vector/cinema-poster-with-cola-film-strip-and-clapper-vector.jpg?s=612x612&w=gi&k=20&c=8ClshQC50T-wPj6CPvnPnFq1Er6Fs8fbrreXWehvdgk="}
         alt={movie.Title}
       />
       <div className="movie-card-info">

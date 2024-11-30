@@ -50,7 +50,7 @@ const HomePage = () => {
       setError("Failed to fetch movies. Try again later.");
     }
   };
-
+  
   // Handle search and reset pagination
   const handleSearch = () => {
     setCurrentPage(1);
