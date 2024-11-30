@@ -6,19 +6,20 @@ import "../styles/HomePage.css";
 const HomePage = () => {
   const [query, setQuery] = useState("");
   const [movies, setMovies] = useState([]);
+  const [defaultMovies, setDefaultMovies] = useState([]); // For default movies
   const [error, setError] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
-  const [moviesPerPage] = useState(5); // Display 5 movies per page
+  const [totalResults, setTotalResults] = useState(0); // For search results
 
   // Fetch default movies on initial load
   useEffect(() => {
     const fetchDefaultMovies = async () => {
       try {
         const response = await axios.get(
-          `https://www.omdbapi.com/?apikey=7d5b89d5&s=Avengers`
+          `https://www.omdbapi.com/?apikey=7d5b89d5&s=Avengers&page=1`
         );
         if (response.data.Response === "True") {
-          setMovies(response.data.Search);
+          setDefaultMovies(response.data.Search);
           setError("");
         } else {
           setError(response.data.Error);
@@ -31,14 +32,15 @@ const HomePage = () => {
     fetchDefaultMovies();
   }, []);
 
-  // Fetch movies based on user query
-  const fetchMovies = async () => {
+  // Fetch movies based on user query and page
+  const fetchMovies = async (page = 1) => {
     try {
       const response = await axios.get(
-        `https://www.omdbapi.com/?apikey=7d5b89d5&s=${query}`
+        `https://www.omdbapi.com/?apikey=7d5b89d5&s=${query}&page=${page}`
       );
       if (response.data.Response === "True") {
         setMovies(response.data.Search);
+        setTotalResults(response.data.totalResults);
         setError("");
       } else {
         setError(response.data.Error);
@@ -49,17 +51,25 @@ const HomePage = () => {
     }
   };
 
-  // Get current page movies
-  const indexOfLastMovie = currentPage * moviesPerPage;
-  const indexOfFirstMovie = indexOfLastMovie - moviesPerPage;
-  const currentMovies = movies.slice(indexOfFirstMovie, indexOfLastMovie);
+  // Handle search and reset pagination
+  const handleSearch = () => {
+    setCurrentPage(1);
+    fetchMovies(1);
+  };
 
-  // Change page
+  // Handle pagination navigation
   const paginate = (direction) => {
-    if (direction === "next" && currentPage < Math.ceil(movies.length / moviesPerPage)) {
-      setCurrentPage(currentPage + 1);
-    } else if (direction === "prev" && currentPage > 1) {
-      setCurrentPage(currentPage - 1);
+    if (query) {
+      // Pagination for search results
+      if (direction === "next" && currentPage < Math.ceil(totalResults / 10)) {
+        const nextPage = currentPage + 1;
+        setCurrentPage(nextPage);
+        fetchMovies(nextPage);
+      } else if (direction === "prev" && currentPage > 1) {
+        const prevPage = currentPage - 1;
+        setCurrentPage(prevPage);
+        fetchMovies(prevPage);
+      }
     }
   };
 
@@ -72,34 +82,36 @@ const HomePage = () => {
           value={query}
           onChange={(e) => setQuery(e.target.value)}
         />
-        <button onClick={fetchMovies}>Search</button>
+        <button onClick={handleSearch}>Search</button>
       </div>
       <div className="results">
         {error && <p className="error">{error}</p>}
         <div className="movie-grid">
-          {currentMovies.map((movie) => (
+          {(query ? movies : defaultMovies).map((movie) => (
             <MovieCard key={movie.imdbID} movie={movie} />
           ))}
         </div>
-        <div className="pagination">
-          <button
-            className="pagination-btn"
-            onClick={() => paginate("prev")}
-            disabled={currentPage === 1}
-          >
-            &#8249; {/* Left Arrow Icon */}
-          </button>
-          <span className="page-number">
-            Page {currentPage} of {Math.ceil(movies.length / moviesPerPage)}
-          </span>
-          <button
-            className="pagination-btn"
-            onClick={() => paginate("next")}
-            disabled={currentPage === Math.ceil(movies.length / moviesPerPage)}
-          >
-            &#8250; {/* Right Arrow Icon */}
-          </button>
-        </div>
+        {query && totalResults > 0 && (
+          <div className="pagination">
+            <button
+              className="pagination-btn"
+              onClick={() => paginate("prev")}
+              disabled={currentPage === 1}
+            >
+              &#8249; {/* Left Arrow Icon */}
+            </button>
+            <span className="page-number">
+              Page {currentPage} of {Math.ceil(totalResults / 10)}
+            </span>
+            <button
+              className="pagination-btn"
+              onClick={() => paginate("next")}
+              disabled={currentPage === Math.ceil(totalResults / 10)}
+            >
+              &#8250; {/* Right Arrow Icon */}
+            </button>
+          </div>
+        )}
       </div>
     </div>
   );
