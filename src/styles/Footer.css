@@ -1,0 +1,48 @@
+.footer {
+    background-color: #212529;
+    color: white;
+    padding: 20px 0;
+    font-size: 14px;
+    text-align: center;
+  }
+  
+  .footer-container {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-around;
+  }
+  
+  .footer-logo img {
+    width: 50px; /* Adjust the logo size */
+    height: auto;
+  }
+
+  .footer-social .footer-text{
+    margin-top: 20px;
+  }
+  
+  .footer-social-icon {
+    margin: 0 10px;
+    color: white;
+    font-size: 20px;
+    text-decoration: none;
+  }
+  
+  .footer-social-icon:hover {
+    color: #e50914; /* Netflix red on hover */
+  }
+  
+  /* Font Awesome icons */
+  .fab {
+    font-size: 20px; /* Set size of social media icons */
+  }
+  
+  /* Responsive Design */
+  @media (max-width: 768px) {
+    .footer-container {
+      flex-direction: column;
+      align-items: center;
+    }
+  }
+  
